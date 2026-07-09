@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Navigation, Filter } from 'lucide-react';
+import { Menu, Plus, Navigation, Filter } from 'lucide-react';
 import Header from './components/Header';
 import MapComponent from './components/MapComponent';
 import ShopCard from './components/ShopCard';
 import AdminPanel from './components/AdminPanel';
+import NavDrawer from './components/NavDrawer';
+import { useHomeViewMode } from './contexts/HomeViewModeContext';
 import { Shop, UserLocation } from './types';
 import { DEFAULT_SHOPS, NZ_CENTER } from './constants';
 import { calculateDistance } from './utils';
@@ -18,6 +20,8 @@ const App: React.FC = () => {
   const [showAdmin, setShowAdmin] = useState(false);
   const [useNearbyFilter, setUseNearbyFilter] = useState(false);
   const [radiusKm, setRadiusKm] = useState(10);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { homeViewMode } = useHomeViewMode();
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -107,6 +111,14 @@ const App: React.FC = () => {
 
         {/* Floating Controls */}
         <div className="absolute top-4 right-4 z-[999] flex flex-col gap-3">
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="p-3 bg-white text-gray-700 rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
           <button 
             onClick={requestLocation}
             className={`p-3 rounded-full shadow-lg transition-all ${userLocation ? 'bg-blue-500 text-white' : 'bg-white text-gray-600'}`}
@@ -187,6 +199,23 @@ const App: React.FC = () => {
           onClose={() => setShowAdmin(false)} 
         />
       )}
+
+      <NavDrawer
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        pathname="/massage/auckland"
+        links={[
+          { label: 'Home', href: '/' },
+          { label: 'Browse by region', href: '/massage' },
+          { label: 'Escort by region', href: '/escort', tone: 'accent' },
+          { label: 'About Us', href: '/about', tone: 'accent' },
+        ]}
+        footer={
+          <p className="text-xs text-gray-500">
+            View mode: <span className="font-semibold text-gray-700">{homeViewMode}</span>
+          </p>
+        }
+      />
     </div>
   );
 };
